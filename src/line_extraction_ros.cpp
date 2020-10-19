@@ -16,6 +16,7 @@ LineExtractionROS::LineExtractionROS(ros::NodeHandle& nh, ros::NodeHandle& nh_lo
 {
   loadParameters();
   line_publisher_ = nh_.advertise<laser_line_extraction::LineSegmentList>("line_segments", 1);
+  cloud_publisher_ = nh_.advertise<sensor_msgs::PointCloud>("filtered_pointcloud", 1);
   scan_subscriber_ = nh_.subscribe(scan_topic_, 1, &LineExtractionROS::laserScanCallback, this);
   if (pub_markers_)
   {
@@ -50,6 +51,12 @@ void LineExtractionROS::run()
     populateMarkerMsg(lines, marker_msg);
     marker_publisher_.publish(marker_msg);
   }
+
+  sensor_msgs::PointCloud pointcloud_msg;
+  std::vector<std::vector<double>> pointcloud;
+  line_extraction_.getFilteredPointcloud(pointcloud);
+  populatePointcloudMsg(pointcloud, pointcloud_msg);
+  cloud_publisher_.publish(pointcloud_msg);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -177,6 +184,18 @@ void LineExtractionROS::populateMarkerMsg(const std::vector<Line> &lines,
   }
   marker_msg.header.frame_id = frame_id_;
   marker_msg.header.stamp = ros::Time::now();
+}
+
+void LineExtractionROS::populatePointcloudMsg(const std::vector<std::vector<double>>& pc, sensor_msgs::PointCloud& pc_msg){
+  pc_msg.header.frame_id = frame_id_;
+  pc_msg.header.stamp = ros::Time::now();
+  pc_msg.points.clear();
+  for(auto& p : pc){
+    geometry_msgs::Point32 p_msg;
+    p_msg.x = p.at(0);
+    p_msg.y = p.at(1);
+    pc_msg.points.push_back(p_msg);
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

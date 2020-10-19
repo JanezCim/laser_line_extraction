@@ -30,6 +30,9 @@ void LineExtraction::extractLines(std::vector<Line>& lines)
   filterCloseAndFarPoints();
   filterOutlierPoints();
 
+  // Save filtered_indices_ to be published as a pointcloud later
+  pub_filtered_indices_ = filtered_indices_;
+
   // Return no lines if not enough points left
   if (filtered_indices_.size() <= std::max(params_.min_line_points, static_cast<unsigned int>(3)))
   {
@@ -358,6 +361,18 @@ void LineExtraction::split(const std::vector<unsigned int>& indices)
     split(second_split);
   }
 
+}
+
+void LineExtraction::getFilteredPointcloud(std::vector<std::vector<double> >& output_pointcloud){
+  output_pointcloud.clear();
+  if(pub_filtered_indices_.size()<3){
+    return;
+  }
+
+  for(size_t i=0; i<pub_filtered_indices_.size(); ++i){
+    std::vector<double> tmp_p = {r_data_.xs[pub_filtered_indices_[i]], r_data_.ys[pub_filtered_indices_[i]]};
+    output_pointcloud.push_back(tmp_p);
+  }
 }
 
 } // namespace line_extraction

@@ -36,6 +36,7 @@ public:
   void setMaxRange(double);
   void setMinSplitDist(double);
   void setOutlierDist(double);
+  void getFilteredPointcloud(std::vector<std::vector<double> >& output_pointcloud);
 
 private:
   // Data structures
@@ -44,6 +45,8 @@ private:
   Params params_;
   // Indices after filtering
   std::vector<unsigned int> filtered_indices_;
+  // Indices after filtering to be published
+  std::vector<unsigned int> pub_filtered_indices_;
   // Line data
   std::vector<Line> lines_;
   // Methods

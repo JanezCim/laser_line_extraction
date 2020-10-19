@@ -6,6 +6,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
 #include <visualization_msgs/Marker.h>
+#include <sensor_msgs/PointCloud.h>
 #include <geometry_msgs/Point.h>
 #include "laser_line_extraction/LineSegment.h"
 #include "laser_line_extraction/LineSegmentList.h"
@@ -31,6 +32,7 @@ private:
   ros::NodeHandle nh_local_;
   ros::Subscriber scan_subscriber_;
   ros::Publisher line_publisher_;
+  ros::Publisher cloud_publisher_;
   ros::Publisher marker_publisher_;
   // Parameters
   std::string frame_id_;
@@ -43,6 +45,7 @@ private:
   void loadParameters();
   void populateLineSegListMsg(const std::vector<Line>&, laser_line_extraction::LineSegmentList&);
   void populateMarkerMsg(const std::vector<Line>&, visualization_msgs::Marker&);
+  void populatePointcloudMsg(const std::vector<std::vector<double>>&, sensor_msgs::PointCloud&);
   void cacheData(const sensor_msgs::LaserScan::ConstPtr&);
   void laserScanCallback(const sensor_msgs::LaserScan::ConstPtr&);
 };
