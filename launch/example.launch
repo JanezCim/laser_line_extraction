@@ -15,6 +15,8 @@
     <param name="~min_split_dist" value="0.04" />
     <param name="~outlier_dist" value="0.06" />
     <param name="~min_line_points" value="10" />
+    <param name="~publish_filtered_pointcloud" value="false"/>
+    
   </node>
 </launch>
 

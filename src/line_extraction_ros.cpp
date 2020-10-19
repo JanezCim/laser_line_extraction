@@ -16,11 +16,14 @@ LineExtractionROS::LineExtractionROS(ros::NodeHandle& nh, ros::NodeHandle& nh_lo
 {
   loadParameters();
   line_publisher_ = nh_.advertise<laser_line_extraction::LineSegmentList>("line_segments", 1);
-  cloud_publisher_ = nh_.advertise<sensor_msgs::PointCloud>("filtered_pointcloud", 1);
   scan_subscriber_ = nh_.subscribe(scan_topic_, 1, &LineExtractionROS::laserScanCallback, this);
   if (pub_markers_)
   {
     marker_publisher_ = nh_.advertise<visualization_msgs::Marker>("line_markers", 1);
+  }
+  if (pub_filtered_pointcloud_)
+  {
+    cloud_publisher_ = nh_.advertise<sensor_msgs::PointCloud>("filtered_pointcloud", 1);
   }
 }
 
@@ -52,11 +55,15 @@ void LineExtractionROS::run()
     marker_publisher_.publish(marker_msg);
   }
 
-  sensor_msgs::PointCloud pointcloud_msg;
-  std::vector<std::vector<double>> pointcloud;
-  line_extraction_.getFilteredPointcloud(pointcloud);
-  populatePointcloudMsg(pointcloud, pointcloud_msg);
-  cloud_publisher_.publish(pointcloud_msg);
+  if (pub_filtered_pointcloud_)
+  {
+    sensor_msgs::PointCloud pointcloud_msg;
+    std::vector<std::vector<double>> pointcloud;
+    line_extraction_.getFilteredPointcloud(pointcloud);
+    populatePointcloudMsg(pointcloud, pointcloud_msg);
+    cloud_publisher_.publish(pointcloud_msg);
+  }
+  
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -72,6 +79,7 @@ void LineExtractionROS::loadParameters()
   
   std::string frame_id, scan_topic;
   bool pub_markers;
+  bool pub_filtered_pointcloud;
 
   nh_local_.param<std::string>("frame_id", frame_id, "laser");
   frame_id_ = frame_id;
@@ -84,6 +92,10 @@ void LineExtractionROS::loadParameters()
   nh_local_.param<bool>("publish_markers", pub_markers, false);
   pub_markers_ = pub_markers;
   ROS_DEBUG("publish_markers: %s", pub_markers ? "true" : "false");
+
+  nh_local_.param<bool>("publish_filtered_pointcloud", pub_filtered_pointcloud, false);
+  pub_filtered_pointcloud_ = pub_filtered_pointcloud;
+  ROS_DEBUG("publish_markers: %s", pub_filtered_pointcloud ? "true" : "false");
 
   // Parameters used by the line extraction algorithm
 

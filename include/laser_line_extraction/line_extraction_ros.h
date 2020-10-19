@@ -38,6 +38,7 @@ private:
   std::string frame_id_;
   std::string scan_topic_;
   bool pub_markers_;
+  bool pub_filtered_pointcloud_;
   // Line extraction
   LineExtraction line_extraction_;
   bool data_cached_; // true after first scan used to cache data

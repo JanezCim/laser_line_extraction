@@ -365,10 +365,13 @@ void LineExtraction::split(const std::vector<unsigned int>& indices)
 
 void LineExtraction::getFilteredPointcloud(std::vector<std::vector<double> >& output_pointcloud){
   output_pointcloud.clear();
+
+  // if pointcloud has less then 3 points exit the function
   if(pub_filtered_indices_.size()<3){
     return;
   }
 
+  // extract the filtered pointcloud
   for(size_t i=0; i<pub_filtered_indices_.size(); ++i){
     std::vector<double> tmp_p = {r_data_.xs[pub_filtered_indices_[i]], r_data_.ys[pub_filtered_indices_[i]]};
     output_pointcloud.push_back(tmp_p);
